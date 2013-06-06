@@ -286,14 +286,59 @@ function onKeyUp(event) {
   }
 }
 
+function onKeyDown(event) {
+console.log(event.key);
+  if (activeTool == "select") {
+    // Move objects 1 pixel with arrow keys
+    if (event.key == "up" || event.key == "down" || event.key == "right" || event.key == "left") {
+      moveItemsBy1Pixel(event.key);
+    }
+  }
+}
+
+function moveItemsBy1Pixel(direction) {
+  var point;
+
+  if (direction == "up") {
+    point = new paper.Point(0, -1);
+  } else if (direction == "down") {
+    point = new paper.Point(0, 1);
+  } else if (direction == "left") {
+    point = new paper.Point(-1, 0);
+  } else if (direction == "right") {
+    point = new paper.Point(1, 0);
+  }
+  
+  if (!point) {
+    return;
+  }
+  
+  if (paper.project.selectedItems.length < 1) {
+    return;
+  }
+  
+  // Move locally
+  var itemNames = new Array();
+  for (x in paper.project.selectedItems) {
+    var item = paper.project.selectedItems[x];
+    item.position += point;
+    itemNames.push(item._name);
+  }
+  
+  view.draw();
+  
+  // Send to server to move  
+  socket.emit('item:move:end', room, uid, itemNames, point);
+}
+
 // Drop image onto canvas to upload it
 $('#myCanvas').bind('dragover dragenter', function(e) {
   e.preventDefault();
 });
 
 $('#myCanvas').bind('drop', function(e) {
-  e = e || window.event; // get window.event if e argument missing (in IE)
-  if (e.preventDefault) {  // stops the browser from redirecting off to the image.
+  e = e || window.event; // Get window.event if e argument missing (in IE)
+  if (e.preventDefault) {  // Stops the browser from redirecting off to the image.
     e.preventDefault();
   }
   e = e.originalEvent;
