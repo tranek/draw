@@ -239,8 +239,10 @@ describe("Move items", function() {
     oldPosition1 = window.frames[0].paper.project.activeLayer.children[0].position;
     oldPosition2 = window.frames[0].paper.project.activeLayer.children[1].position;
     oldPosition3 = window.frames[0].paper.project.activeLayer.children[2].position;
+
     // Simulate dragging on path 3
     canvas.simulate('drag', {clientX: oldPosition3._x, clientY: oldPosition3._y, dx: 100, dy: 100});
+
     newPosition1 = window.frames[0].paper.project.activeLayer.children[0].position;
     newPosition2 = window.frames[0].paper.project.activeLayer.children[1].position;
     newPosition3 = window.frames[0].paper.project.activeLayer.children[2].position;
@@ -254,6 +256,13 @@ describe("Move items", function() {
     if (newPosition3._x === oldPosition3._x || newPosition3._y === oldPosition3._y) {
       throw new Error("Path 3 did not move.");
     }
+    // Check actual pixels moved. Seems to be some rounding +/- 6% of expected pixels.
+    /*if (newPosition3._x !== (oldPosition3._x + 100) || newPosition3._y !== (oldPosition3._y + 100)) {
+      var xdiff = newPosition3._x - oldPosition3._x;
+      var ydiff = newPosition3._y - oldPosition3._y;
+      throw new Error("Incorrect number of pixels moved. X difference: " + xdiff +
+        " pixels, Y difference: " + ydiff + " pixels. Should be 100 for each.");
+    }*/
     done();
   });
 
@@ -302,8 +311,8 @@ describe("Move items", function() {
 
     var chrome$ = helper.padChrome$;
     chrome$("#selectTool").click();
-
     var canvas = chrome$("#myCanvas");
+
     // Path 4, draw in corner instead of center to not drag an existing path
     canvas.simulate('drag', {dx: 50, dy: 50, handle: 'corner'});
     numChildren = window.frames[0].paper.project.activeLayer.children.length;
@@ -326,6 +335,7 @@ describe("Move items", function() {
 
     var chrome$ = helper.padChrome$;
     var canvas = chrome$("#myCanvas");
+
     // Simulate clicking path3
     center3 = window.frames[0].paper.project.activeLayer.children[2].position;
     canvas.simulate('mousedown', {clientX: center3.x, clientY: center3.y});
@@ -340,7 +350,69 @@ describe("Move items", function() {
 
   it("arrow keys move single path", function(done) {
     this.timeout(60000);
-    throw new Error("Not implemented yet.");
+
+    var numChildren = window.frames[0].paper.project.activeLayer.children.length;
+    if (numChildren !== 3) { // Expect 3 children
+      throw new Error("Incorrect number of children in project. Found " + numChildren + " but expected 3.");
+    }
+
+    var itemsSelected = window.frames[0].paper.project.selectedItems.length;
+    if (itemsSelected !== 1) { // Expect only one path to be selected
+      throw new Error("Items selected = " + itemsSelected + " instead of just 1.");
+    }
+
+    // Make sure path 3 is selected
+    if (window.frames[0].paper.project.length !== 1 || window.frames[0].paper.project.activeLayer.children[2].selected === false) {
+      window.frames[0].paper.project.activeLayer.selected = false; // Clear any selections
+      window.frames[0].paper.project.activeLayer.children[2].selected = true;
+    }
+
+    var chrome$ = helper.padChrome$;
+    var canvas = chrome$("#myCanvas");
+    oldPosition1 = window.frames[0].paper.project.activeLayer.children[0].position;
+    oldPosition2 = window.frames[0].paper.project.activeLayer.children[1].position;
+    oldPosition3 = window.frames[0].paper.project.activeLayer.children[2].position;
+
+throw new Error("Add simulate arrow keys, each one!");
+    // Simulate pressing the up key
+    canvas.simulate('keyDown', {key: 'up'});
+    canvas.simulate('keyUp', {key: 'up'});
+
+throw new Error("Check for changed position... Maybe check each key individually ugh!");
+
+    // Simulate pressing the down key
+    canvas.simulate('keyDown', {key: 'down'});
+    canvas.simulate('keyUp', {key: 'down'});
+
+    // Simulate pressing the left key
+    canvas.simulate('keyDown', {key: 'left'});
+    canvas.simulate('keyUp', {key: 'left'});
+
+    // Simulate pressing the right key
+    canvas.simulate('keyDown', {key: 'right'});
+    canvas.simulate('keyUp', {key: 'right'});
+
+    newPosition1 = window.frames[0].paper.project.activeLayer.children[0].position;
+    newPosition2 = window.frames[0].paper.project.activeLayer.children[1].position;
+    newPosition3 = window.frames[0].paper.project.activeLayer.children[2].position;
+
+    if (newPosition1._x !== oldPosition1._x || newPosition1._y !== oldPosition1._y) {
+      throw new Error("Path 1 moved when only 3 should have moved..");
+    }
+    if (newPosition2._x !== oldPosition2._x || newPosition2._y !== oldPosition2._y) {
+      throw new Error("Path 2 moved when only 3 should have moved.");
+    }
+    if (newPosition3._x === oldPosition3._x || newPosition3._y === oldPosition3._y) {
+      throw new Error("Path 3 did not move.");
+    }
+    // Check actual pixels moved
+    if (newPosition3._x !== (oldPosition3._x + 100) || newPosition3._y !== (oldPosition._y + 100)) {
+      var xdiff = newPosition3._x - oldPosition3._x;
+      var ydiff = newPosition3._y - oldPosition3._y;
+      throw new Error("Incorrect number of pixels moved. X difference: " + xdiff +
+        " pixels, Y difference: " + ydiff + " pixels. Should be 100 for each.");
+    }
+throw new Error("Not implemented yet.");
     done();
   });
 
@@ -466,6 +538,19 @@ throw new Error("Not implemented yet - arrow keys.");
     if (newPosition3._x !== oldPosition3._x || newPosition3._y !== oldPosition3._y) {
       throw new Error("Path 3 moved when only 1 and 2 should have moved.");
     }
+    // Check actual pixels moved. Seems to be some rounding +/- 6% of expected pixels.
+    /*if (newPosition1._x !== (oldPosition1._x - 100) || newPosition1._y !== (oldPosition1._y - 100)) {
+      var xdiff = newPosition1._x - oldPosition1._x;
+      var ydiff = newPosition1._y - oldPosition1._y;
+      throw new Error("Incorrect number of pixels moved. X difference: " + xdiff +
+        " pixels, Y difference: " + ydiff + " pixels. Should be -100 for each.");
+    }
+    if (newPosition2._x !== (oldPosition2._x - 100) || newPosition2._y !== (oldPosition2._y - 100)) {
+      var xdiff = newPosition2._x - oldPosition2._x;
+      var ydiff = newPosition2._y - oldPosition2._y;
+      throw new Error("Incorrect number of pixels moved. X difference: " + xdiff +
+        " pixels, Y difference: " + ydiff + " pixels. Should be -100 for each.");
+    }*/
     done();
   });
   
@@ -481,7 +566,7 @@ throw new Error("Not implemented yet - arrow keys.");
     }, oldPadName);
   });
   
-  it("paths moved on server", function(done) {
+  it("paths moved on server by mouse", function(done) {
     this.timeout(60000);
     var numChildren = window.frames[0].paper.project.activeLayer.children.length;
     if (numChildren !== 3) { // Expect 3 children
@@ -591,6 +676,7 @@ throw new Error("Not implemented yet.");
     if (newPosition3._x !== oldPosition3._x || newPosition3._y !== oldPosition3._y) {
       throw new Error("Path 3 moved when only 1 and 2 should have moved.");
     }
+throw new Error("Add check for actual pixels moved!");
     done();
   });
   
@@ -606,7 +692,7 @@ throw new Error("Not implemented yet.");
     }, oldPadName);
   });
   
-  it("paths moved on server", function(done) {
+  it("paths moved on server by arrow keys", function(done) {
     this.timeout(60000);
 throw new Error("Not implemented yet.");
     var numChildren = window.frames[0].paper.project.activeLayer.children.length;
