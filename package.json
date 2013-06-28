@@ -1,17 +1,20 @@
 {
-  "name": "drawstuff",
-  "subdomain": "drawstuff",
-  "scripts": {
-    "start": "app.js"
+  "name": "etherdraw",
+  "description": "Collaborative drawing and sketching in real time",
+  "repository" : { 
+    "type" : "git",
+    "url" : "http://github.com/JohnMcLear/draw.git"
   },
-  "version": "0.0.0-14",
+  "version": "0.0.2",
   "engines": {
     "node": "0.6.x"
   },
   "dependencies": {
     "express": "*",
     "socket.io": "*",
-	"ueberDB": "*",
-	"canvas": "*"
+    "async": "*",
+    "ueberDB": "*",
+    "canvas": "*",
+    "paper": "*"
   }
 }
